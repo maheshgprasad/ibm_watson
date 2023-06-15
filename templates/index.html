@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Watson Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            /* background-color: #f2f2f2; */
+            background-color: teal;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        .chatbox {
+            height: 300px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .chatbox p {
+            margin: 0 0 10px;
+        }
+
+        .input-group {
+            display: flex;
+        }
+
+        .input-group input[type="text"] {
+            flex-grow: 1;
+            padding: 8px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+        }
+
+        .input-group button {
+            padding: 8px 20px;
+            margin-left: 10px;
+            border-radius: 3px;
+            border: none;
+            background-color: #4caf50;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .input-group button:hover {
+            background-color: #45a049;
+        }
+
+        h1 {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        p {
+            
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: smaller;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Chatbot</h1>
+        <!-- <p>WARNING: In case of session timeout / exit  restart uvicorn</p> -->
+        <div class="chatbox" id="chatbox"></div>
+        <div class="input-group">
+            <input type="text" id="message" placeholder="Type your message" />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to display a new message in the chatbox
+        function displayMessage(message, sender) {
+            const chatbox = document.getElementById('chatbox');
+            const newMessage = document.createElement('p');
+            newMessage.textContent = `${sender}: ${message}`;
+            chatbox.appendChild(newMessage);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        // Function to send a message to the FastAPI backend
+        function sendMessage() {
+            const messageInput = document.getElementById('message');
+            const message = messageInput.value;
+
+            if (message) {
+                displayMessage(message, 'You');
+
+                // Send the message to the backend
+                fetch(`/chatbot/${encodeURIComponent(message)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const botMessage = data.message;
+                        displayMessage(botMessage, 'Bot');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+
+                messageInput.value = '';
+            }
+        }
+    </script>
+</body>
+</html>
